@@ -15,6 +15,10 @@ app.get("/identificador", (req, res) => {
   res.sendFile(path.join(__dirname, "../src/pages/identificador.html"));
 });
 
+app.get("/dibujoLogin", (req, res) => {
+  res.sendFile(path.join(__dirname, "../src/pages/dibujoLogin.html"));
+});
+
 app.listen(PORT, () => {
   console.log(`Server corriendo en: http://localhost:${PORT}`);
 });
