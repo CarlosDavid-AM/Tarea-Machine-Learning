@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reconocimiento con Audio</title>
+    <!-- CDN necesarios para el ejemplo -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"></script>
+    <script src="https://unpkg.com/ml5@0.5.0/dist/ml5.min.js"></script>
+  </head>
+  <body>
+    <button type="button" id="speakButton">Hablar</button>
+
+    <script type="text/javascript">
+      // Clasificador y modelo
+      let classifier;
+      let imageModelURL = "../models/";
+
+      // Video
+      let video;
+      let flippedVideo;
+      // Para almacenar la clasificación
+      let label = "Cargando modelo...";
+
+      // Cargar el modelo primero
+      function preload() {
+        classifier = ml5.imageClassifier(imageModelURL + "model.json");
+      }
+
+      function setup() {
+        createCanvas(320, 260);
+        // Crear el video
+        video = createCapture(VIDEO);
+        video.size(320, 240);
+        video.hide();
+
+        flippedVideo = ml5.flipImage(video);
+        // Iniciar la clasificación
+        classifyVideo();
+
+        // Botón para hablar
+        const speakButton = document.querySelector("#speakButton");
+        speakButton.addEventListener("click", () => {
+          if (label) {
+            const message = new SpeechSynthesisUtterance(label);
+            // Usar la primera voz disponible por defecto
+            const voices = speechSynthesis.getVoices();
+            if (voices.length > 0) {
+              message.voice = voices[0];
+            }
+            speechSynthesis.speak(message);
+          }
+        });
+      }
+
+      function draw() {
+        background(0);
+        // Dibujar el video
+        image(flippedVideo, 0, 0);
+
+        // Dibujar la etiqueta del resultado
+        fill(255);
+        textSize(16);
+        textAlign(CENTER);
+        text(label, width / 2, height - 4);
+      }
+
+      // Obtener una predicción para el cuadro de video actual
+      function classifyVideo() {
+        flippedVideo = ml5.flipImage(video);
+        classifier.classify(flippedVideo, gotResult);
+      }
+
+      // Cuando obtenemos un resultado
+      function gotResult(error, results) {
+        if (error) {
+          console.error(error);
+          return;
+        }
+        // Los resultados están en un arreglo ordenado por confianza.
+        label = results[0].label;
+        // ¡Clasificar de nuevo!
+        classifyVideo();
+      }
+
+      // Cargar las voces para el sintetizador
+      speechSynthesis.onvoiceschanged = () => {
+        console.log("Voces del sintetizador cargadas.");
+      };
+    </script>
+  </body>
+</html>
