@@ -19,6 +19,10 @@ app.get("/dibujoLogin", (req, res) => {
   res.sendFile(path.join(__dirname, "../src/pages/dibujoLogin.html"));
 });
 
+app.get("/reconosimientoAudio", (req, res) => {
+  res.sendFile(path.join(__dirname, "../src/pages/reconosimientoAudio.html"));
+});
+
 app.listen(PORT, () => {
   console.log(`Server corriendo en: http://localhost:${PORT}`);
 });
